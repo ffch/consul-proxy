@@ -1,10 +1,9 @@
 package cn.pomit.consul.endpoint;
 
-import cn.pomit.consul.handler.ResourceHandler;
+import cn.pomit.consul.handler.AbstractResourceHandler;
 import cn.pomit.consul.handler.factory.ResourceHandlerFactory;
 
 public class JsonHttpServer extends NettyServerTemplate {
-	private Class<? extends ResourceHandler> resourceHandler = null;
 
 	public JsonHttpServer(int port, String name, String charset) {
 		this.port = port;
@@ -22,15 +21,11 @@ public class JsonHttpServer extends NettyServerTemplate {
 		this.port = port;
 	}
 
-	public JsonHttpServer() {
-	}
-
-	public void setResourceHandler(Class<? extends ResourceHandler> resourceHandler) {
-		this.resourceHandler = resourceHandler;
+	public JsonHttpServer(){
 	}
 
 	@Override
-	protected ResourceHandler resourceHandler() throws Exception {
+	protected AbstractResourceHandler resourceHandler() throws Exception {
 		return ResourceHandlerFactory.createResourceHandler(resourceHandler, consulProperties);
 	}
 

@@ -2,43 +2,11 @@ package cn.pomit.consul.http;
 
 import java.util.List;
 
+import cn.pomit.consul.http.res.ResCode;
+import cn.pomit.consul.http.res.ResType;
 import io.netty.handler.codec.http.HttpHeaders;
 
 public class HttpResponseMessage {
-	public enum ResType {
-		HTML("text/html"), JSON("application/json"), JS("application/javascript"), PNG("image/png"), TEXT(
-				"text/plain"), JPG("image/jpg");
-		String value = null;
-
-		ResType(String value) {
-			this.value = value;
-		}
-
-		public String getValue() {
-			return value;
-		}
-
-		public static ResType enumType(String value) {
-			for (ResType m : ResType.values()) {
-				if (m.getValue().equals(value))
-					return m;
-			}
-			return HTML;
-		}
-	}
-
-	public enum ResCode {
-		NOT_FOUND(404), OK(200), REDIRECT(302), INTERNAL_ERROR(500);
-		int value = 200;
-
-		ResCode(int value) {
-			this.value = value;
-		}
-
-		public int getValue() {
-			return value;
-		}
-	}
 
 	public int resCode;
 
@@ -71,8 +39,8 @@ public class HttpResponseMessage {
 	}
 
 	public void setNotFound(String url) {
-		setResCode(HttpResponseMessage.ResCode.NOT_FOUND.getValue());
-		setResType(HttpResponseMessage.ResType.HTML.getValue());
+		setResCode(ResCode.NOT_FOUND.getValue());
+		setResType(ResType.HTML.getValue());
 		setRedirectUrl(url);
 		setMessage("找不到该页面。");
 		setResponseNow(true);

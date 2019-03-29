@@ -3,6 +3,7 @@ package cn.pomit.consul.handler.codec;
 import java.util.List;
 
 import cn.pomit.consul.http.HttpResponseMessage;
+import cn.pomit.consul.http.res.ResCode;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
@@ -36,7 +37,7 @@ public class FullHttpResponseEncoder extends MessageToMessageEncoder<HttpRespons
 				for (String cookie : message.getEncodedCookie())
 					response.headers().add(HttpHeaderNames.SET_COOKIE, cookie);
 			}
-			if (message.getResCode() == HttpResponseMessage.ResCode.REDIRECT.getValue()) {
+			if (message.getResCode() == ResCode.REDIRECT.getValue()) {
 				response.headers().add(HttpHeaderNames.LOCATION, message.getRedirectUrl());
 			}
 

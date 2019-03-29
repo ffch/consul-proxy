@@ -6,13 +6,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import cn.pomit.consul.handler.DefaultResourceHandler;
-import cn.pomit.consul.handler.AbstractResourceHandler;
-
-@Target({ ElementType.TYPE })
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface JsonServer {
-	int port() default -1;
-	Class<? extends AbstractResourceHandler> handler() default DefaultResourceHandler.class;
+public @interface Value {
+	String value() default "";
 }

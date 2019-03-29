@@ -2,15 +2,16 @@ package cn.pomit.consul.http;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cn.pomit.consul.http.HttpResponseMessage.ResCode;
-import cn.pomit.consul.http.HttpResponseMessage.ResType;
+import com.alibaba.fastjson.util.TypeUtils;
+
+import cn.pomit.consul.http.res.ResCode;
+import cn.pomit.consul.http.res.ResType;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -18,9 +19,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.cookie.Cookie;
-import io.netty.handler.codec.http.cookie.DefaultCookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
-import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
 import io.netty.handler.codec.http.multipart.DefaultHttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
@@ -65,8 +64,20 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 		this.hr = hr;
 	}
 
-	public Map<String, Object> getParams() {
-		return params;
+	public Object getParameter(String key) {
+		return params.get(key);
+	}
+	
+	public String getParameterString(String key) {
+		return params.get(key).toString();
+	}
+	
+	public int getParameterInt(String key) {
+		return TypeUtils.cast(params.get(key), Integer.class, null);
+	}
+	
+	public boolean getParameterBoolean(String key) {
+		return TypeUtils.cast(params.get(key), Boolean.class, null);
 	}
 
 	public void setParams(Map<String, Object> params) {
@@ -101,22 +112,22 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 	}
 
 	public void parseRequest() {
-		setUrl(this.uri());
-
-		String cookieStr = this.headers().get("Cookie");
-		if (!StringUtil.isNullOrEmpty(cookieStr)) {
-			Set<Cookie> cookiesSet = ServerCookieDecoder.LAX.decode(cookieStr);
-			if (cookiesSet != null && cookiesSet.size() > 0) {
-				Iterator<Cookie> it = cookiesSet.iterator();
-				while (it.hasNext()) {
-					Cookie cookie = it.next();
-					cookies.put(cookie.name(), cookie);
-				}
-			}
-		}
-
 		try {
 			URI uri = new URI(uri());
+			setUrl(uri.getPath());
+	
+			String cookieStr = this.headers().get("Cookie");
+			if (!StringUtil.isNullOrEmpty(cookieStr)) {
+				Set<Cookie> cookiesSet = ServerCookieDecoder.LAX.decode(cookieStr);
+				if (cookiesSet != null && cookiesSet.size() > 0) {
+					Iterator<Cookie> it = cookiesSet.iterator();
+					while (it.hasNext()) {
+						Cookie cookie = it.next();
+						cookies.put(cookie.name(), cookie);
+					}
+				}
+			}
+		
 			if (uri.getQuery() != null && !"".equals(uri.getQuery())) {
 				Map<String, Object> params = createGetParamMap(uri.getQuery());
 				setParams(params);

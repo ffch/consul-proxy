@@ -8,7 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import cn.pomit.consul.config.ApplicationProperties;
 import cn.pomit.consul.discovery.ConsulRegister;
 import cn.pomit.consul.handler.HttpServerHandler;
-import cn.pomit.consul.handler.ResourceHandler;
+import cn.pomit.consul.handler.AbstractResourceHandler;
 import cn.pomit.consul.handler.codec.FullHttpResponseEncoder;
 import cn.pomit.consul.util.PropertyUtil;
 import io.netty.bootstrap.ServerBootstrap;
@@ -24,6 +24,8 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 
 public abstract class NettyServerTemplate {
+	protected Class<? extends AbstractResourceHandler> resourceHandler = null;
+
 	protected Integer port = null;
 	protected String name = null;
 	public static String DEFAULT_NAME = "JsonServer";
@@ -33,6 +35,7 @@ public abstract class NettyServerTemplate {
 	static private EventLoopGroup bossGroup = new NioEventLoopGroup();
 	static private EventLoopGroup workerGroup = new NioEventLoopGroup();
 	protected ApplicationProperties consulProperties = null;
+	protected AbstractResourceHandler abstractResourceHandler = null;
 
 	NettyServerTemplate() {
 		Properties properties = null;
@@ -45,12 +48,14 @@ public abstract class NettyServerTemplate {
 
 		port = consulProperties.getApplicationPort();
 		name = consulProperties.getApplicationName();
+
 	}
 
 	protected ChannelHandler[] createHandlers() throws Exception {
+		abstractResourceHandler = resourceHandler();
 		return new ChannelHandler[] { new HttpResponseEncoder(), new HttpRequestDecoder(),
 				new HttpObjectAggregator(1048576), new FullHttpResponseEncoder(charset),
-				new HttpServerHandler(resourceHandler(), consulProperties) };
+				new HttpServerHandler(abstractResourceHandler, consulProperties) };
 	}
 
 	public void start() throws Exception {
@@ -71,11 +76,12 @@ public abstract class NettyServerTemplate {
 			log.error("无法绑定端口：" + port);
 			throw new Exception("无法绑定端口：" + port);
 		}
-
-		log.info("服务[{" + name + "}]启动完毕，监听端口[{" + port + "}]");
+		log.info("server启动完毕，开始注册服务");
 
 		ConsulRegister consulRegister = new ConsulRegister(consulProperties);
 		consulRegister.register();
+		
+		log.info("服务[{" + name + "}]启动完毕，监听端口[{" + port + "}]");
 	}
 
 	public void stop() {
@@ -84,5 +90,11 @@ public abstract class NettyServerTemplate {
 		log.info("服务[{" + name + "}]关闭。");
 	}
 
-	abstract protected ResourceHandler resourceHandler() throws Exception;
+	public void setResourceHandler(Class<? extends AbstractResourceHandler> resourceHandler) throws Exception {
+		this.resourceHandler = resourceHandler;
+		AbstractResourceHandler.initInstance(resourceHandler, consulProperties);
+
+	}
+
+	abstract protected AbstractResourceHandler resourceHandler() throws Exception;
 }
