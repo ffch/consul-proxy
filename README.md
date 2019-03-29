@@ -54,6 +54,10 @@ handler中可以使用Mapping注解进行路径映射：
 @Mapping("/alarm/gateway")
 ```
 
+## Demo项目
+
+## [Gitee-Consul-proxy-test](https://gitee.com/ffch/consul-proxy-test)
+## [Github-Consul-proxy-test](https://github.com/ffch/consul-proxy-test)
 
 ## 版权声明
 JpaMapper使用 Apache License 2.0 协议.
