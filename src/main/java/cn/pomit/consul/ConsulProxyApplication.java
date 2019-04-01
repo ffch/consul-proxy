@@ -1,13 +1,13 @@
 package cn.pomit.consul;
 
-import cn.pomit.consul.annotation.JsonServer;
+import cn.pomit.consul.annotation.EnableServer;
 import cn.pomit.consul.endpoint.JsonHttpServer;
 
 public class ConsulProxyApplication {
 
 	public static void run(Class<?> app) {
 		try {
-			JsonServer jsonServer = app.getAnnotation(JsonServer.class);
+			EnableServer jsonServer = app.getAnnotation(EnableServer.class);
 			int port = jsonServer.port();
 			JsonHttpServer defaultJsonServer = null;
 			if (port > 0) {
