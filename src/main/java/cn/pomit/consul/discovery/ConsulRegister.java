@@ -3,8 +3,8 @@ package cn.pomit.consul.discovery;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ecwid.consul.ConsulException;
 import com.ecwid.consul.v1.ConsulClient;
@@ -14,14 +14,14 @@ import cn.pomit.consul.config.ApplicationProperties;
 
 public class ConsulRegister {
 	private ApplicationProperties consulProperties = null;
-	private final Log log = LogFactory.getLog(getClass());
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	public ConsulRegister(ApplicationProperties consulProperties) {
 		this.consulProperties = consulProperties;
 	}
 
 	public void register() {
-		log.info("注册服务到:" + consulProperties.getHost() + ":" + consulProperties.getPort());
+		log.info("注册服务到:{}:{}", consulProperties.getHost(), consulProperties.getPort());
 		ConsulClient client = new ConsulClient(consulProperties.getHost(), consulProperties.getPort());
 		NewService service = new NewService();
 		service.setId(consulProperties.getInstanceId());
@@ -37,7 +37,7 @@ public class ConsulRegister {
 			log.warn("Error registering service with consul: " + service, e);
 		}
 		client.agentServiceRegister(service);
-		log.info("服务已注册：" + service);
+		log.info("服务已注册：{}", service);
 	}
 
 	private void setCheck(NewService service) {

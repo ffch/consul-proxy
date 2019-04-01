@@ -8,11 +8,11 @@ import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class InetUtil {
-	private final static Log log = LogFactory.getLog(InetUtil.class);
+	private final static Logger log = LoggerFactory.getLogger(InetUtil.class);
 
 	public static InetAddress findFirstNonLoopbackAddress(List<String> preferredAddress) {
 		InetAddress result = null;

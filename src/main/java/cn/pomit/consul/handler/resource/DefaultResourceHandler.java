@@ -1,7 +1,7 @@
 package cn.pomit.consul.handler.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cn.pomit.consul.annotation.Mapping;
 import cn.pomit.consul.http.HttpRequestMessage;
@@ -10,11 +10,11 @@ import cn.pomit.consul.http.res.ResCode;
 import cn.pomit.consul.http.res.ResType;
 
 public class DefaultResourceHandler extends AbstractResourceHandler {
-	private final Log log = LogFactory.getLog(getClass());
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	@Mapping("/**")
 	public HttpResponseMessage all(HttpRequestMessage httpRequestMessage){
-		log.debug(httpRequestMessage);
+		log.debug(httpRequestMessage.toString());
 
 		HttpResponseMessage httpResponseMessage = new HttpResponseMessage();
 		httpResponseMessage.setResCode(ResCode.OK.getValue());

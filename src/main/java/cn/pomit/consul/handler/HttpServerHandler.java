@@ -1,7 +1,7 @@
 package cn.pomit.consul.handler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cn.pomit.consul.http.HttpRequestMessage;
 import cn.pomit.consul.http.HttpResponseMessage;
@@ -14,7 +14,7 @@ import io.netty.handler.codec.http.HttpRequest;
 
 public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 	private ResourceServerHandler resourceHandler = null;
-	private final Log log = LogFactory.getLog(getClass());
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	public HttpServerHandler(ResourceServerHandler resourceHandler) {
 		this.resourceHandler = resourceHandler;

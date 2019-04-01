@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cn.pomit.consul.config.ApplicationProperties;
 import cn.pomit.consul.discovery.ConsulRegister;
@@ -34,7 +34,8 @@ public abstract class NettyServerTemplate {
 	public static String DEFAULT_NAME = "JsonServer";
 	protected static String PROPERTIES_NAME = "application.properties";
 	protected String charset = "UTF-8";
-	private final Log log = LogFactory.getLog(getClass());
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	static private EventLoopGroup bossGroup = new NioEventLoopGroup();
 	static private EventLoopGroup workerGroup = new NioEventLoopGroup();
 	protected ApplicationProperties consulProperties = null;
@@ -76,21 +77,21 @@ public abstract class NettyServerTemplate {
 
 		ChannelFuture cf = b.bind(port).await();
 		if (!cf.isSuccess()) {
-			log.error("无法绑定端口：" + port);
+			log.error("无法绑定端口：{}", port);
 			throw new Exception("无法绑定端口：" + port);
 		}
 		log.info("server启动完毕，开始注册服务");
 
 		ConsulRegister consulRegister = new ConsulRegister(consulProperties);
 		consulRegister.register();
-		
-		log.info("服务[{" + name + "}]启动完毕，监听端口[{" + port + "}]");
+
+		log.info("服务[{}]启动完毕，监听端口[{}]", name, port);
 	}
 
 	public void stop() {
 		bossGroup.shutdownGracefully().syncUninterruptibly();
 		workerGroup.shutdownGracefully().syncUninterruptibly();
-		log.info("服务[{" + name + "}]关闭。");
+		log.info("服务[{}]关闭。", name);
 	}
 
 	public void setResourceHandlers(Class<? extends AbstractResourceHandler> resourceHandler[]) throws Exception {

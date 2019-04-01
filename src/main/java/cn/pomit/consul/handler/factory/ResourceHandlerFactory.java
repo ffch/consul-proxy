@@ -3,8 +3,8 @@ package cn.pomit.consul.handler.factory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.util.TypeUtils;
 
@@ -18,8 +18,8 @@ import cn.pomit.consul.util.ReflectUtil;
 import io.netty.util.internal.StringUtil;
 
 public class ResourceHandlerFactory {
-	protected static Log log = LogFactory.getLog(ResourceHandlerFactory.class);
-	
+	protected static Logger log = LoggerFactory.getLogger(ResourceHandlerFactory.class);
+
 	public static ResourceServerHandler createResourceServerHandler(ApplicationProperties applicationProperties)
 			throws Exception {
 		ResourceServerHandler resourceHandler = ResourceServerHandler.getInstance();
@@ -29,7 +29,7 @@ public class ResourceHandlerFactory {
 
 	public static void initValues(AbstractResourceHandler resourceHandler, ApplicationProperties applicationProperties)
 			throws Exception {
-		log.info("初始化@Value注解。。。");
+		log.info("初始化{}的@Value注解。。。", resourceHandler);
 		Field fields[] = resourceHandler.getClass().getDeclaredFields();
 		for (Field field : fields) {
 			Value value = field.getAnnotation(Value.class);
@@ -46,13 +46,13 @@ public class ResourceHandlerFactory {
 			String param = applicationProperties.getString(value.value());
 			if (StringUtil.isNullOrEmpty(param))
 				continue;
-			
+
 			setMethod.invoke(resourceHandler, TypeUtils.cast(param, type, null));
 		}
 	}
 
 	public static void initMethodHandlers(AbstractResourceHandler resourceHandler) {
-		log.info("初始化@Mapping注解。。。");
+		log.info("初始化{}@Mapping注解。。。", resourceHandler);
 		Method[] methods = resourceHandler.getClass().getMethods();
 
 		for (int j = 0; j < methods.length; j++) {

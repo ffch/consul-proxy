@@ -1,12 +1,12 @@
 package cn.pomit.consul.handler.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cn.pomit.consul.config.ApplicationProperties;
 
 public abstract class AbstractResourceHandler {
-	protected final Log log = LogFactory.getLog(getClass());
+	protected final Logger log = LoggerFactory.getLogger(getClass());
 	protected ApplicationProperties applicationProperties;
 
 	public ApplicationProperties getApplicationProperties() {

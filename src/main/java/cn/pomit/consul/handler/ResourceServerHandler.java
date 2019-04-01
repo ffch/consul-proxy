@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cn.pomit.consul.config.ApplicationProperties;
 import cn.pomit.consul.handler.factory.ResourceHandlerFactory;
@@ -17,7 +17,7 @@ import cn.pomit.consul.http.HttpRequestMessage;
 import cn.pomit.consul.http.HttpResponseMessage;
 
 public class ResourceServerHandler {
-	protected final Log log = LogFactory.getLog(getClass());
+	protected final Logger log = LoggerFactory.getLogger(getClass());
 	protected ApplicationProperties applicationProperties;
 	private static Map<String, HandlerMethod> normalMethod = new HashMap<>();
 	private static Map<String, HandlerMethod> elMethod = new HashMap<>();
