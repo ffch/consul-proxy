@@ -11,16 +11,18 @@ import com.alibaba.fastjson.util.TypeUtils;
 import cn.pomit.consul.annotation.Mapping;
 import cn.pomit.consul.annotation.Value;
 import cn.pomit.consul.config.ApplicationProperties;
-import cn.pomit.consul.handler.AbstractResourceHandler;
+import cn.pomit.consul.handler.ResourceServerHandler;
+import cn.pomit.consul.handler.method.HandlerMethod;
+import cn.pomit.consul.handler.resource.AbstractResourceHandler;
 import cn.pomit.consul.util.ReflectUtil;
 import io.netty.util.internal.StringUtil;
 
 public class ResourceHandlerFactory {
 	protected static Log log = LogFactory.getLog(ResourceHandlerFactory.class);
-	public static AbstractResourceHandler createResourceHandler(
-			Class<? extends AbstractResourceHandler> resourceHandlerClass, ApplicationProperties applicationProperties)
+	
+	public static ResourceServerHandler createResourceServerHandler(ApplicationProperties applicationProperties)
 			throws Exception {
-		AbstractResourceHandler resourceHandler = AbstractResourceHandler.getInstance();
+		ResourceServerHandler resourceHandler = ResourceServerHandler.getInstance();
 
 		return resourceHandler;
 	}
@@ -49,9 +51,9 @@ public class ResourceHandlerFactory {
 		}
 	}
 
-	public static void initMethodHandlers(Class<? extends AbstractResourceHandler> resourceHandlerClass) {
+	public static void initMethodHandlers(AbstractResourceHandler resourceHandler) {
 		log.info("初始化@Mapping注解。。。");
-		Method[] methods = resourceHandlerClass.getMethods();
+		Method[] methods = resourceHandler.getClass().getMethods();
 
 		for (int j = 0; j < methods.length; j++) {
 			Mapping mapping = methods[j].getAnnotation(Mapping.class);
@@ -65,9 +67,15 @@ public class ResourceHandlerFactory {
 			}
 			if (methodValue.contains("**")) {
 				String param[] = methodValue.split("\\*\\*");
-				AbstractResourceHandler.getElMethod().put(param[0], methods[j]);
+				HandlerMethod handlerMethod = new HandlerMethod();
+				handlerMethod.setMethod(methods[j]);
+				handlerMethod.setResourceHandler(resourceHandler);
+				ResourceServerHandler.getElMethod().put(param[0], handlerMethod);
 			} else {
-				AbstractResourceHandler.getNormalMethod().put(methodValue, methods[j]);
+				HandlerMethod handlerMethod = new HandlerMethod();
+				handlerMethod.setMethod(methods[j]);
+				handlerMethod.setResourceHandler(resourceHandler);
+				ResourceServerHandler.getNormalMethod().put(methodValue, handlerMethod);
 			}
 
 		}

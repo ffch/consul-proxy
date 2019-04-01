@@ -3,7 +3,6 @@ package cn.pomit.consul.handler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import cn.pomit.consul.config.ApplicationProperties;
 import cn.pomit.consul.http.HttpRequestMessage;
 import cn.pomit.consul.http.HttpResponseMessage;
 import cn.pomit.consul.http.res.ResCode;
@@ -14,20 +13,16 @@ import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 
 public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
-	private AbstractResourceHandler resourceHandler = null;
-	private ApplicationProperties consulProperties;
+	private ResourceServerHandler resourceHandler = null;
 	private final Log log = LogFactory.getLog(getClass());
 
-	public HttpServerHandler(AbstractResourceHandler resourceHandler, ApplicationProperties consulProperties) {
+	public HttpServerHandler(ResourceServerHandler resourceHandler) {
 		this.resourceHandler = resourceHandler;
-		this.consulProperties = consulProperties;
 	}
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, HttpObject msg) {
 		try {
-			if (resourceHandler == null)
-				resourceHandler = new DefaultResourceHandler();
 
 			HttpRequest httpRequest = (HttpRequest) msg;
 			HttpRequestMessage httpRequestMessage = new HttpRequestMessage(httpRequest);

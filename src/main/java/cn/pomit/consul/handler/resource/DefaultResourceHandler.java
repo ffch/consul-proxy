@@ -1,4 +1,4 @@
-package cn.pomit.consul.handler;
+package cn.pomit.consul.handler.resource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

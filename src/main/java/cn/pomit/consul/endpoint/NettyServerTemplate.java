@@ -1,5 +1,7 @@
 package cn.pomit.consul.endpoint;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -8,8 +10,9 @@ import org.apache.commons.logging.LogFactory;
 import cn.pomit.consul.config.ApplicationProperties;
 import cn.pomit.consul.discovery.ConsulRegister;
 import cn.pomit.consul.handler.HttpServerHandler;
-import cn.pomit.consul.handler.AbstractResourceHandler;
+import cn.pomit.consul.handler.ResourceServerHandler;
 import cn.pomit.consul.handler.codec.FullHttpResponseEncoder;
+import cn.pomit.consul.handler.resource.AbstractResourceHandler;
 import cn.pomit.consul.util.PropertyUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -24,7 +27,7 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 
 public abstract class NettyServerTemplate {
-	protected Class<? extends AbstractResourceHandler> resourceHandler = null;
+	protected List<Class<? extends AbstractResourceHandler>> resourceHandlerList = null;
 
 	protected Integer port = null;
 	protected String name = null;
@@ -35,7 +38,7 @@ public abstract class NettyServerTemplate {
 	static private EventLoopGroup bossGroup = new NioEventLoopGroup();
 	static private EventLoopGroup workerGroup = new NioEventLoopGroup();
 	protected ApplicationProperties consulProperties = null;
-	protected AbstractResourceHandler abstractResourceHandler = null;
+	protected ResourceServerHandler resourceServerHandler = null;
 
 	NettyServerTemplate() {
 		Properties properties = null;
@@ -52,10 +55,10 @@ public abstract class NettyServerTemplate {
 	}
 
 	protected ChannelHandler[] createHandlers() throws Exception {
-		abstractResourceHandler = resourceHandler();
+		resourceServerHandler = resourceHandler();
 		return new ChannelHandler[] { new HttpResponseEncoder(), new HttpRequestDecoder(),
 				new HttpObjectAggregator(1048576), new FullHttpResponseEncoder(charset),
-				new HttpServerHandler(abstractResourceHandler, consulProperties) };
+				new HttpServerHandler(resourceServerHandler) };
 	}
 
 	public void start() throws Exception {
@@ -90,11 +93,11 @@ public abstract class NettyServerTemplate {
 		log.info("服务[{" + name + "}]关闭。");
 	}
 
-	public void setResourceHandler(Class<? extends AbstractResourceHandler> resourceHandler) throws Exception {
-		this.resourceHandler = resourceHandler;
-		AbstractResourceHandler.initInstance(resourceHandler, consulProperties);
+	public void setResourceHandlers(Class<? extends AbstractResourceHandler> resourceHandler[]) throws Exception {
+		this.resourceHandlerList = Arrays.asList(resourceHandler);
+		ResourceServerHandler.initInstance(resourceHandlerList, consulProperties);
 
 	}
 
-	abstract protected AbstractResourceHandler resourceHandler() throws Exception;
+	abstract protected ResourceServerHandler resourceHandler() throws Exception;
 }

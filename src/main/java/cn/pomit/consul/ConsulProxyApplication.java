@@ -15,7 +15,7 @@ public class ConsulProxyApplication {
 			} else {
 				defaultJsonServer = new JsonHttpServer();
 			}
-			defaultJsonServer.setResourceHandler(jsonServer.handler());
+			defaultJsonServer.setResourceHandlers(jsonServer.handler());
 			defaultJsonServer.start();
 		} catch (Exception e) {
 			e.printStackTrace();
