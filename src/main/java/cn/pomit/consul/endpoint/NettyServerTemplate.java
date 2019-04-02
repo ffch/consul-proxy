@@ -26,10 +26,11 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
+import io.netty.handler.timeout.IdleStateHandler;
 
 public abstract class NettyServerTemplate {
 	protected List<Class<? extends AbstractResourceHandler>> resourceHandlerList = null;
-
+	private static int httpIdleTime = 120;
 	protected Integer port = null;
 	protected String name = null;
 	public static String DEFAULT_NAME = "JsonServer";
@@ -58,7 +59,7 @@ public abstract class NettyServerTemplate {
 
 	protected ChannelHandler[] createHandlers() throws Exception {
 		resourceServerHandler = resourceHandler();
-		return new ChannelHandler[] { new HttpResponseEncoder(), new HttpRequestDecoder(),
+		return new ChannelHandler[] { new IdleStateHandler(0, 0, httpIdleTime), new HttpResponseEncoder(), new HttpRequestDecoder(),
 				new HttpObjectAggregator(1048576), new FullHttpResponseEncoder(charset),
 				new HttpServerHandler(resourceServerHandler) };
 	}
