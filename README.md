@@ -1,3 +1,7 @@
+[![License](http://img.shields.io/:license-apache-blue.svg "2.0")](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![JDK 1.7](https://img.shields.io/badge/JDK-1.7-green.svg "JDK 1.6")]()
+[![Maven Central](https://img.shields.io/maven-central/v/cn.pomit/consul-proxy.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22cn.pomit%22%20AND%20a:%22consul-proxy%22)
+
 ## Consul-proxy项目简介
 
 Springcloud+consul作为微服务的注册已经见怪不怪了，试下也很流行，在我个人云服务器上，我也是这样做的。
@@ -15,9 +19,23 @@ Consul-proxy使用netty+consul实现服务注册，并提供了若干简单的�
  1. 快速启动。
  2. 映射路径。
  3. handler中的属性注入。
+ 4. 多handler支持，类似于spring的Controller。
  
 
 ## 使用说明
+
+jar包已经上传到maven中央仓库。
+https://search.maven.org/search?q=consul-proxy ，groupId为cn.pomit。
+
+### maven依赖
+
+```xml
+<dependency>
+	<groupId>cn.pomit</groupId>
+	<artifactId>consul-proxy</artifactId>
+	<version>1.0</version>
+</dependency>
+```
 
 ### 启动
 
@@ -75,6 +93,102 @@ cloud和netty最大连接数分别设置为10000，最大线程数设置为200.
 |netty| 3000 | 1925 |1647|0|
 |cloud| 20000 | 15653 |7591|0.50605|
 |netty| 20000 | 11737 |7076|0.2289|
+
+## 示例
+
+启动：
+
+```java
+package cn.pomit.alarm;
+
+import cn.pomit.alarm.handler.FalconAlarmHandler;
+import cn.pomit.alarm.handler.GatewayAlarmHandler;
+import cn.pomit.consul.ConsulProxyApplication;
+import cn.pomit.consul.annotation.EnableServer;
+
+@EnableServer(handler={FalconAlarmHandler.class,GatewayAlarmHandler.class})
+public class AlarmApp {
+	public static void main(String[] args) {
+		ConsulProxyApplication.run(AlarmApp.class);
+	}
+}
+
+```
+
+handler：
+
+```java
+public class GatewayAlarmHandler extends AbstractResourceHandler {
+	@Value("api.gateway.kongUrl")
+	private String apiGatewayKongUrl;
+
+	@Value("api.gateway.appKey")
+	private String apiGatewayAppKey;
+
+	@Value("api.gateway.appSecret")
+	private String apiGatewayAppSecret;
+
+	@Mapping("/alarm/gateway")
+	public HttpResponseMessage gateway(HttpRequestMessage httpRequestMessage) {
+		try {
+			log.info("apiGatewayAppSecret: " + apiGatewayAppSecret + ", apiGatewayAppKey: " + apiGatewayAppKey);
+
+			ApiGatewayClient apiGatewayClient = new ApiGatewayClient.Builder().kongUrl(apiGatewayKongUrl)
+					.appKey(apiGatewayAppKey).appSecret(apiGatewayAppSecret).client(HttpClientPrototype.getHttpClient())
+					.build();
+
+			ApiGatewayService apiGatewayService = new ApiGatewayService(apiGatewayClient);
+			ResultModel resultModel = apiGatewayService.getAlarmInfo(null);
+			HttpResponseMessage httpResponseMessage = new HttpResponseMessage();
+			httpResponseMessage.setResCode(ResCode.OK.getValue());
+			httpResponseMessage.setResType(ResType.JSON.getValue());
+			httpResponseMessage.setMessage(JSONObject.toJSONString(resultModel));
+			return httpResponseMessage;
+		} catch (Exception e) {
+			e.printStackTrace();
+			HttpResponseMessage httpResponseMessage = new HttpResponseMessage();
+			httpResponseMessage.setResCode(ResCode.OK.getValue());
+			httpResponseMessage.setResType(ResType.JSON.getValue());
+			httpResponseMessage.setMessage(JSONObject.toJSONString(ResultModel.error("请求API网关失败")));
+			return httpResponseMessage;
+		}
+	}
+
+	@Mapping("/health")
+	public HttpResponseMessage health(HttpRequestMessage httpRequestMessage) {
+		HttpResponseMessage httpResponseMessage = new HttpResponseMessage();
+		httpResponseMessage.setResCode(ResCode.OK.getValue());
+		httpResponseMessage.setResType(ResType.TEXT.getValue());
+		httpResponseMessage.setMessage("操作成功！");
+		return httpResponseMessage;
+	}
+
+	public String getApiGatewayKongUrl() {
+		return apiGatewayKongUrl;
+	}
+
+	public void setApiGatewayKongUrl(String apiGatewayKongUrl) {
+		this.apiGatewayKongUrl = apiGatewayKongUrl;
+	}
+
+	public String getApiGatewayAppKey() {
+		return apiGatewayAppKey;
+	}
+
+	public void setApiGatewayAppKey(String apiGatewayAppKey) {
+		this.apiGatewayAppKey = apiGatewayAppKey;
+	}
+
+	public String getApiGatewayAppSecret() {
+		return apiGatewayAppSecret;
+	}
+
+	public void setApiGatewayAppSecret(String apiGatewayAppSecret) {
+		this.apiGatewayAppSecret = apiGatewayAppSecret;
+	}
+
+}
+```
 
 ## Demo项目
 
