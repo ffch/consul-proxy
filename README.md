@@ -54,6 +54,27 @@ handler中可以使用Mapping注解进行路径映射：
 @Mapping("/alarm/gateway")
 ```
 
+## 性能测试
+调用demo项目中的hosts接口对cloud和netty进行对比
+
+cloud和netty最大连接数分别设置为10000，最大线程数设置为200.
+
+对比结果如下：
+
+|  |内存|
+|----------|:
+| cloud | 185m |
+| netty | 117m |
+
+|| 采样值 |平均时间|偏离 |异常率|
+|----------|:----------|:----------|:----------|:
+|cloud| 1000 | 3128 |1888|0|
+|netty| 1000 | 2215 |2072|0|
+|cloud| 3000 | 3416 |2882|0|
+|netty| 3000 | 1925 |1647|0|
+|cloud| 20000 | 15653 |7591|0.50605|
+|netty| 20000 | 11737 |7076|0.2289|
+
 ## Demo项目
 
 ## [Gitee-Consul-proxy-test](https://gitee.com/ffch/consul-proxy-test)
