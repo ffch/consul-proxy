@@ -28,6 +28,8 @@ Consul-proxy使用netty+consul实现服务注册，并提供了若干简单的�
 jar包已经上传到maven中央仓库。
 https://search.maven.org/search?q=consul-proxy ，groupId为cn.pomit。
 
+[使用文档地址](https://www.pomit.cn/consul-proxy)
+
 ### maven依赖
 
 ```xml
@@ -202,6 +204,7 @@ public class GatewayAlarmHandler extends AbstractResourceHandler {
 
 ## [Gitee-Consul-proxy-test](https://gitee.com/ffch/consul-proxy-test)
 ## [Github-Consul-proxy-test](https://github.com/ffch/consul-proxy-test)
+## [Get-Started](https://www.pomit.cn/consul-proxy)
 
 ## 版权声明
 JpaMapper使用 Apache License 2.0 协议.
