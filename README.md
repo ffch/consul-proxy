@@ -20,7 +20,7 @@ Consul-proxy使用netty+consul实现服务注册，并提供了若干简单的�
  2. 映射路径。
  3. handler中的属性注入。
  4. 多handler支持，类似于spring的Controller。
- 5. 支持springboot的server.port和spring.profiles.active多配置文件
+ 5. 支持springboot的server.port和spring.profiles.active多配置文件 (V1.1版本)
  
 
 ## 使用说明
@@ -36,7 +36,7 @@ https://search.maven.org/search?q=consul-proxy ，groupId为cn.pomit。
 <dependency>
 	<groupId>cn.pomit</groupId>
 	<artifactId>consul-proxy</artifactId>
-	<version>1.0</version>
+	<version>1.1</version>
 </dependency>
 ```
 
@@ -75,7 +75,7 @@ handler中可以使用Mapping注解进行路径映射：
 @Mapping("/alarm/gateway")
 ```
 
-#### 多配置文件
+#### 多配置文件（V1.1版本）
 
 可以在命令行使用server.port。
 
