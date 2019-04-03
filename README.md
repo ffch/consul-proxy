@@ -20,6 +20,7 @@ Consul-proxy使用netty+consul实现服务注册，并提供了若干简单的�
  2. 映射路径。
  3. handler中的属性注入。
  4. 多handler支持，类似于spring的Controller。
+ 5. 支持springboot的server.port和spring.profiles.active多配置文件
  
 
 ## 使用说明
@@ -71,6 +72,13 @@ handler中可以使用Mapping注解进行路径映射：
 ```java
 @Mapping("/alarm/gateway")
 ```
+
+#### 多配置文件
+
+可以在命令行使用server.port。
+
+可以使用spring.profiles.active或者profiles.active指定多个配置文件。
+
 
 ## 性能测试
 调用demo项目中的hosts接口对cloud和netty进行对比
