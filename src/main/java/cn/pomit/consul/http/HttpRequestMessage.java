@@ -67,17 +67,17 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 	public Object getParameter(String key) {
 		return params.get(key);
 	}
-	
+
 	public String getParameterString(String key) {
-		return params.get(key).toString();
+		return params.get(key) == null ? null : params.get(key).toString();
 	}
-	
+
 	public int getParameterInt(String key) {
-		return TypeUtils.cast(params.get(key), Integer.class, null);
+		return TypeUtils.cast(params.get(key), int.class, null);
 	}
-	
+
 	public boolean getParameterBoolean(String key) {
-		return TypeUtils.cast(params.get(key), Boolean.class, null);
+		return TypeUtils.cast(params.get(key), boolean.class, null);
 	}
 
 	public void setParams(Map<String, Object> params) {
@@ -115,7 +115,7 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 		try {
 			URI uri = new URI(uri());
 			setUrl(uri.getPath());
-	
+
 			String cookieStr = this.headers().get("Cookie");
 			if (!StringUtil.isNullOrEmpty(cookieStr)) {
 				Set<Cookie> cookiesSet = ServerCookieDecoder.LAX.decode(cookieStr);
@@ -127,7 +127,7 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 					}
 				}
 			}
-		
+
 			if (uri.getQuery() != null && !"".equals(uri.getQuery())) {
 				Map<String, Object> params = createGetParamMap(uri.getQuery());
 				setParams(params);
