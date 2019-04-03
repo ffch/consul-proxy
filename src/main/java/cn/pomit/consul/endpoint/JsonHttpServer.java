@@ -1,5 +1,6 @@
 package cn.pomit.consul.endpoint;
 
+import cn.pomit.consul.config.ApplicationProperties;
 import cn.pomit.consul.handler.ResourceServerHandler;
 import cn.pomit.consul.handler.factory.ResourceHandlerFactory;
 
@@ -22,6 +23,12 @@ public class JsonHttpServer extends NettyServerTemplate {
 	}
 
 	public JsonHttpServer(){
+	}
+
+	public JsonHttpServer(ApplicationProperties consulProperties) {
+		this.consulProperties = consulProperties;
+		port = consulProperties.getApplicationPort();
+		name = consulProperties.getApplicationName();
 	}
 
 	@Override

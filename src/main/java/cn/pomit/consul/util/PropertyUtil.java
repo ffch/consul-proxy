@@ -8,6 +8,9 @@ public class PropertyUtil {
 
 	public static Properties getProperties(String fileName) throws IOException {
 		InputStream resource = PropertyUtil.class.getClassLoader().getResourceAsStream(fileName);
+		if(resource == null){
+			throw new IOException(fileName + "文件不存在！");
+		}
 		Properties properties = new Properties();
 		properties.load(resource);
 		resource.close();

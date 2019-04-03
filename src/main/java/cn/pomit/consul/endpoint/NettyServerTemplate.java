@@ -2,7 +2,6 @@ package cn.pomit.consul.endpoint;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,6 @@ import cn.pomit.consul.handler.HttpServerHandler;
 import cn.pomit.consul.handler.ResourceServerHandler;
 import cn.pomit.consul.handler.codec.FullHttpResponseEncoder;
 import cn.pomit.consul.handler.resource.AbstractResourceHandler;
-import cn.pomit.consul.util.PropertyUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -44,17 +42,7 @@ public abstract class NettyServerTemplate {
 	protected ResourceServerHandler resourceServerHandler = null;
 
 	NettyServerTemplate() {
-		Properties properties = null;
-		try {
-			properties = PropertyUtil.getProperties(PROPERTIES_NAME);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		consulProperties = new ApplicationProperties(properties, port);
-
-		port = consulProperties.getApplicationPort();
-		name = consulProperties.getApplicationName();
-
+		
 	}
 
 	protected ChannelHandler[] createHandlers() throws Exception {
