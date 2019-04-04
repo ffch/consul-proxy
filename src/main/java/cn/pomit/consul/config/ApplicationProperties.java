@@ -252,4 +252,13 @@ public class ApplicationProperties {
 			return list;
 		}
 	}
+
+	public Properties getServerProperties() {
+		return serverProperties;
+	}
+
+	public void setServerProperties(Properties serverProperties) {
+		this.serverProperties = serverProperties;
+	}
+	
 }

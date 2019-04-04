@@ -36,7 +36,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 				httpResponseMessage = new HttpResponseMessage();
 				httpResponseMessage.setResType(ResType.TEXT.getValue());
 				httpResponseMessage.setResCode(ResCode.INTERNAL_ERROR.getValue());
-				httpResponseMessage.setMessage("内部错误！");
+				httpResponseMessage.setMessage("未找到相应的路径映射信息！");
 			}
 			log.debug("响应数据：" + httpResponseMessage);
 			ctx.writeAndFlush(httpResponseMessage);
@@ -47,7 +47,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 			HttpResponseMessage httpResponseMessage = new HttpResponseMessage();
 			httpResponseMessage.setResType(ResType.TEXT.getValue());
 			httpResponseMessage.setResCode(ResCode.INTERNAL_ERROR.getValue());
-			httpResponseMessage.setMessage(e.getMessage());
+			httpResponseMessage.setMessage("异常抛出：" + e.getMessage());
 			ctx.writeAndFlush(httpResponseMessage);
 		}
 	}

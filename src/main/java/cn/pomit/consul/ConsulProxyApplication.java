@@ -8,6 +8,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cn.pomit.consul.annotation.EnableMybatis;
 import cn.pomit.consul.annotation.EnableServer;
 import cn.pomit.consul.config.ApplicationProperties;
 import cn.pomit.consul.config.DefaultSource;
@@ -24,6 +25,9 @@ public class ConsulProxyApplication {
 	protected static String APPLICATION_ENV = "profiles.active";
 	protected static String SERVER_PORT = "server.port";
 	protected static String APPLICATION_PORT = "application.port";
+
+	protected static String DATABASE_CONFIG_CLASS = "mybatis.configuration";
+
 	private static Logger log = LoggerFactory.getLogger(ConsulProxyApplication.class);
 
 	public static void run(Class<?> app, String[] args) {
@@ -36,6 +40,26 @@ public class ConsulProxyApplication {
 
 			defaultJsonServer.setResourceHandlers(jsonServer.handler());
 			defaultJsonServer.start();
+
+			EnableMybatis enableMybatis = app.getAnnotation(EnableMybatis.class);
+			if (enableMybatis != null) {
+				String className = consulProperties.getString(DATABASE_CONFIG_CLASS);
+				if (StringUtil.isNullOrEmpty(className)) {
+					log.error("未找到myabtsi的配置信息");
+					throw new Exception("未找到myabtsi的配置信息");
+				}
+				Class<?> cls = Class.forName(className);
+				String mapperScan = enableMybatis.mapperScan();
+
+				Object obj = null;
+				if (!StringUtil.isNullOrEmpty(mapperScan)) {
+					obj = cls.getDeclaredConstructor(String.class, Properties.class).newInstance(mapperScan,
+							consulProperties.getServerProperties());
+				} else {
+					obj = cls.getDeclaredConstructor(Properties.class)
+							.newInstance(consulProperties.getServerProperties());
+				}
+			}
 		} catch (IOException e) {
 			log.error("读取配置文件失败！", e);
 			e.printStackTrace();

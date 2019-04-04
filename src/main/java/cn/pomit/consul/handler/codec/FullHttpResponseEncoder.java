@@ -22,8 +22,11 @@ public class FullHttpResponseEncoder extends MessageToMessageEncoder<HttpRespons
 	}
 
 	@Override
-	protected void encode(ChannelHandlerContext ctx, HttpResponseMessage message, List<Object> out) {
+	protected void encode(ChannelHandlerContext ctx, HttpResponseMessage message, List<Object> out) throws Exception {
 		try {
+			if(message.getMessage() == null){
+				message.setMessage("");
+			}
 			DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
 					HttpResponseStatus.valueOf(message.getResCode()),
 					Unpooled.wrappedBuffer(message.getMessage().getBytes(charset)));
@@ -44,6 +47,7 @@ public class FullHttpResponseEncoder extends MessageToMessageEncoder<HttpRespons
 			out.add(response);
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw e;
 		}
 
 	}
