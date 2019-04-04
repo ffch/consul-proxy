@@ -35,7 +35,7 @@ public class ResourceHandlerFactory {
 			Value value = field.getAnnotation(Value.class);
 			if (value == null)
 				continue;
-
+			
 			Class<?> type = field.getType();
 			String fieldName = field.getName();
 			if (!ReflectUtil.isJavaClass(type))

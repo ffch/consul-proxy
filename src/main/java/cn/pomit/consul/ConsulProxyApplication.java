@@ -26,23 +26,6 @@ public class ConsulProxyApplication {
 	protected static String APPLICATION_PORT = "application.port";
 	private static Logger log = LoggerFactory.getLogger(ConsulProxyApplication.class);
 
-	public static void run(Class<?> app) {
-		try {
-			EnableServer jsonServer = app.getAnnotation(EnableServer.class);
-			int port = jsonServer.port();
-			JsonHttpServer defaultJsonServer = null;
-			if (port > 0) {
-				defaultJsonServer = new JsonHttpServer(port);
-			} else {
-				defaultJsonServer = new JsonHttpServer();
-			}
-			defaultJsonServer.setResourceHandlers(jsonServer.handler());
-			defaultJsonServer.start();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	public static void run(Class<?> app, String[] args) {
 		try {
 			List<Source> sourceList = initProperties(args);
