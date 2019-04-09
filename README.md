@@ -21,6 +21,7 @@ Consul-proxy使用netty+consul实现服务注册，并提供了若干简单的�
  3. handler中的属性注入。
  4. 多handler支持，类似于spring的Controller。
  5. 支持springboot的server.port和spring.profiles.active多配置文件 (V1.1版本)
+ 6. 支持@EnableMybatis注解，快速使用mybatis(V1.2版本)
  
 
 ## 使用说明
@@ -36,7 +37,7 @@ https://search.maven.org/search?q=consul-proxy ，groupId为cn.pomit。
 <dependency>
 	<groupId>cn.pomit</groupId>
 	<artifactId>consul-proxy</artifactId>
-	<version>1.1</version>
+	<version>1.2</version>
 </dependency>
 ```
 
@@ -46,6 +47,19 @@ https://search.maven.org/search?q=consul-proxy ，groupId为cn.pomit。
 
 ```java
 @JsonServer(handler=AlarmHandler.class)
+public class AlarmApp {
+	public static void main(String[] args) {
+		ConsulProxyApplication.run(AlarmApp.class);
+	}
+
+}
+```
+
+若使用mybatis-proxy，可以如下启动：
+
+```java
+@JsonServer(handler=AlarmHandler.class)
+@EnableMybatis(mapperScan = "cn.pomit.alarm.mapper")
 public class AlarmApp {
 	public static void main(String[] args) {
 		ConsulProxyApplication.run(AlarmApp.class);
@@ -207,7 +221,7 @@ public class GatewayAlarmHandler extends AbstractResourceHandler {
 ## [Get-Started](https://www.pomit.cn/consul-proxy)
 
 ## 版权声明
-JpaMapper使用 Apache License 2.0 协议.
+consul-proxy使用 Apache License 2.0 协议.
 
 ## 作者信息
       
