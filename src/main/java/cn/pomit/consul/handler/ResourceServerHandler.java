@@ -1,5 +1,7 @@
 package cn.pomit.consul.handler;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,9 +51,9 @@ public class ResourceServerHandler {
 		return instance;
 	}
 
-	public HttpResponseMessage handle(HttpRequestMessage httpRequestMessage) throws Exception {
+	public HttpResponseMessage handle(HttpRequestMessage httpRequestMessage) throws Throwable {
 		String url = httpRequestMessage.getUrl();
-		log.debug("处理url：" + url);
+		log.trace("处理url：" + url);
 		HandlerMethod handlerMethod = normalMethod.get(url);
 		if (handlerMethod == null) {
 			handlerMethod = elMethod.get(url);
@@ -61,9 +63,27 @@ public class ResourceServerHandler {
 
 		HttpResponseMessage res = null;
 
-		res = (HttpResponseMessage) handlerMethod.getMethod().invoke(handlerMethod.getResourceHandler(),
-				httpRequestMessage);
+		try {
+			res = (HttpResponseMessage) handlerMethod.getMethod().invoke(handlerMethod.getResourceHandler(),
+					httpRequestMessage);
+		} catch (Exception e) {
+			Throwable unwrap = unwrapThrowable(e);
+			throw unwrap;
+		}
 		return res;
+	}
+
+	public static Throwable unwrapThrowable(Throwable wrapped) {
+		Throwable unwrapped = wrapped;
+		while (true) {
+			if (unwrapped instanceof InvocationTargetException) {
+				unwrapped = ((InvocationTargetException) unwrapped).getTargetException();
+			} else if (unwrapped instanceof UndeclaredThrowableException) {
+				unwrapped = ((UndeclaredThrowableException) unwrapped).getUndeclaredThrowable();
+			} else {
+				return unwrapped;
+			}
+		}
 	}
 
 	public ApplicationProperties getApplicationProperties() {

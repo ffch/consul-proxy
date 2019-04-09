@@ -1,5 +1,5 @@
 [![License](http://img.shields.io/:license-apache-blue.svg "2.0")](http://www.apache.org/licenses/LICENSE-2.0.html)
-[![JDK 1.7](https://img.shields.io/badge/JDK-1.7-green.svg "JDK 1.6")]()
+[![JDK 1.8](https://img.shields.io/badge/JDK-1.8-green.svg "JDK 1.8")]()
 [![Maven Central](https://img.shields.io/maven-central/v/cn.pomit/consul-proxy.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22cn.pomit%22%20AND%20a:%22consul-proxy%22)
 
 ## Consul-proxy项目简介
@@ -12,7 +12,7 @@ Consul-proxy使用netty+consul实现服务注册，并提供了若干简单的�
 
 ## [Gitee](https://gitee.com/ffch/consul-proxy)
 ## [Github](https://github.com/ffch/consul-proxy)
-
+## [Get Started](https://www.pomit.cn/consul-proxy/)
 
 ## 主要功能
 

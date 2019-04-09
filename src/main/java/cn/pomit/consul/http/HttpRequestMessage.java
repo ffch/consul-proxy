@@ -2,6 +2,7 @@ package cn.pomit.consul.http;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,11 +30,12 @@ import io.netty.util.internal.StringUtil;
 
 public class HttpRequestMessage extends DefaultHttpRequest {
 	private Map<String, Object> params = null;
-	private ByteBuf content = null;
+	private String content = null;
 	private String url = "";
 	private HttpRequest hr = null;
 	private Map<String, Cookie> cookies = new HashMap<>();
 	private HttpResponseMessage hrm = new HttpResponseMessage();
+	private Charset charset = Charset.defaultCharset();
 
 	public HttpRequestMessage(HttpVersion httpVersion, HttpMethod method, String uri) {
 		super(httpVersion, method, uri);
@@ -50,13 +52,6 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 		super(defaultHttpRequest.protocolVersion(), defaultHttpRequest.method(), defaultHttpRequest.uri(),
 				defaultHttpRequest.headers());
 		this.params = params;
-	}
-
-	public HttpRequestMessage(DefaultHttpRequest defaultHttpRequest, ByteBuf content) {
-		super(defaultHttpRequest.protocolVersion(), defaultHttpRequest.method(), defaultHttpRequest.uri(),
-				defaultHttpRequest.headers());
-		this.content = content;
-		this.hr = defaultHttpRequest;
 	}
 
 	public HttpRequestMessage(HttpRequest hr) {
@@ -84,12 +79,20 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 		this.params = params;
 	}
 
-	public ByteBuf getContent() {
+	public String getContent() {
 		return content;
 	}
 
-	public void setContent(ByteBuf content) {
+	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public Charset getCharset() {
+		return charset;
+	}
+
+	public void setCharset(Charset charset) {
+		this.charset = charset;
 	}
 
 	public void setUrl(String url) {
@@ -136,7 +139,7 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 				params = new HashMap<>();
 			if (hr instanceof FullHttpRequest) {
 				FullHttpRequest request = (FullHttpRequest) hr;
-				setContent(request.content());
+				setContent(request.content().toString(charset));
 				HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(new DefaultHttpDataFactory(false), request);
 				List<InterfaceHttpData> postData = decoder.getBodyHttpDatas(); //
 				for (InterfaceHttpData data : postData) {

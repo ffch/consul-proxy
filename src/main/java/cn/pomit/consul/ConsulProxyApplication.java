@@ -1,6 +1,7 @@
 package cn.pomit.consul;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -51,13 +52,12 @@ public class ConsulProxyApplication {
 				Class<?> cls = Class.forName(className);
 				String mapperScan = enableMybatis.mapperScan();
 
-				Object obj = null;
 				if (!StringUtil.isNullOrEmpty(mapperScan)) {
-					obj = cls.getDeclaredConstructor(String.class, Properties.class).newInstance(mapperScan,
-							consulProperties.getServerProperties());
+					Method initConfiguration = cls.getMethod("initConfiguration", String.class, Properties.class);
+					initConfiguration.invoke(null, mapperScan, consulProperties.getServerProperties());
 				} else {
-					obj = cls.getDeclaredConstructor(Properties.class)
-							.newInstance(consulProperties.getServerProperties());
+					Method initConfiguration = cls.getMethod("initConfiguration", Properties.class);
+					initConfiguration.invoke(null, consulProperties.getServerProperties());
 				}
 			}
 		} catch (IOException e) {

@@ -28,7 +28,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 			HttpRequestMessage httpRequestMessage = new HttpRequestMessage(httpRequest);
 			httpRequestMessage.parseRequest();
 
-			log.debug("收到请求：" + httpRequestMessage.getUrl());
+			log.trace("收到请求：" + httpRequestMessage.getUrl());
 			HttpResponseMessage httpResponseMessage = httpRequestMessage.getReponse();
 
 			httpResponseMessage = resourceHandler.handle(httpRequestMessage);
@@ -38,10 +38,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 				httpResponseMessage.setResCode(ResCode.INTERNAL_ERROR.getValue());
 				httpResponseMessage.setMessage("未找到相应的路径映射信息！");
 			}
-			log.debug("响应数据：" + httpResponseMessage);
+			log.trace("响应数据：" + httpResponseMessage);
 			ctx.writeAndFlush(httpResponseMessage);
 			return;
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			log.error(e.getStackTrace()[0] + "---" + e.getMessage());
 			HttpResponseMessage httpResponseMessage = new HttpResponseMessage();
