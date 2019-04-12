@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import cn.pomit.consul.annotation.EnableMybatis;
 import cn.pomit.consul.annotation.EnableServer;
+import cn.pomit.consul.annotation.InitConfiguration;
 import cn.pomit.consul.config.ApplicationProperties;
 import cn.pomit.consul.config.DefaultSource;
 import cn.pomit.consul.config.PropertySource;
@@ -60,6 +61,24 @@ public class ConsulProxyApplication {
 					initConfiguration.invoke(null, consulProperties.getServerProperties());
 				}
 			}
+			
+			InitConfiguration initConfiguration = app.getAnnotation(InitConfiguration.class);
+			if(initConfiguration != null && initConfiguration.configurations().length > 0){
+				for(Class<?> cls : initConfiguration.configurations()){
+					Method initMethod = null;
+					try{
+						initMethod = cls.getMethod("initConfiguration");
+					}catch(Exception e){
+						if(initMethod == null){
+							initMethod = cls.getMethod("initConfiguration", Properties.class);
+						}	
+					}
+					if(initMethod != null){
+						initMethod.invoke(null, consulProperties.getServerProperties());
+					}
+				}
+			}
+			
 		} catch (IOException e) {
 			log.error("读取配置文件失败！", e);
 			e.printStackTrace();

@@ -6,7 +6,7 @@
 
 	<groupId>cn.pomit</groupId>
 	<artifactId>consul-proxy</artifactId>
-	<version>1.2</version>
+	<version>1.3</version>
 	<name>consul-proxy</name>
 	<description>user netty + consul to register services</description>
 	<url>http://maven.apache.org</url>
