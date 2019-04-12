@@ -33,6 +33,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
 			httpResponseMessage = resourceHandler.handle(httpRequestMessage);
 			if (httpResponseMessage == null) {
+				log.error("未找到相应的路径映射信息！");
 				httpResponseMessage = new HttpResponseMessage();
 				httpResponseMessage.setResType(ResType.TEXT.getValue());
 				httpResponseMessage.setResCode(ResCode.INTERNAL_ERROR.getValue());

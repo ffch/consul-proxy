@@ -2,6 +2,8 @@ package cn.pomit.consul.http;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSONObject;
+
 import cn.pomit.consul.http.res.ResCode;
 import cn.pomit.consul.http.res.ResType;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -84,6 +86,14 @@ public class HttpResponseMessage {
 
 	public void setResponseNow(boolean responseNow) {
 		this.responseNow = responseNow;
+	}
+	
+	public static HttpResponseMessage responeseBody(Object obj){
+		HttpResponseMessage httpResponseMessage = new HttpResponseMessage();
+		httpResponseMessage.setResCode(ResCode.OK.getValue());
+		httpResponseMessage.setResType(ResType.JSON.getValue());
+		httpResponseMessage.setMessage(JSONObject.toJSONString(obj));
+		return httpResponseMessage;
 	}
 
 	@Override
