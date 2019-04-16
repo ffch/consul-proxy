@@ -13,7 +13,6 @@ import com.alibaba.fastjson.util.TypeUtils;
 
 import cn.pomit.consul.http.res.ResCode;
 import cn.pomit.consul.http.res.ResType;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
@@ -140,6 +139,13 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 			if (hr instanceof FullHttpRequest) {
 				FullHttpRequest request = (FullHttpRequest) hr;
 				setContent(request.content().toString(charset));
+				String contentTypeValue = hr.headers().get("Content-Type");
+				
+				if(!StringUtil.isNullOrEmpty(contentTypeValue)){
+					if(contentTypeValue.contains("application/json")){
+						return;
+					}
+				}
 				HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(new DefaultHttpDataFactory(false), request);
 				List<InterfaceHttpData> postData = decoder.getBodyHttpDatas(); //
 				for (InterfaceHttpData data : postData) {
