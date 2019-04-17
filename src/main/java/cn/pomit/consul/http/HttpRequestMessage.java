@@ -13,6 +13,7 @@ import com.alibaba.fastjson.util.TypeUtils;
 
 import cn.pomit.consul.http.res.ResCode;
 import cn.pomit.consul.http.res.ResType;
+import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
@@ -29,7 +30,7 @@ import io.netty.util.internal.StringUtil;
 
 public class HttpRequestMessage extends DefaultHttpRequest {
 	private Map<String, Object> params = null;
-	private String content = null;
+	private ByteBuf content = null;
 	private String url = "";
 	private HttpRequest hr = null;
 	private Map<String, Cookie> cookies = new HashMap<>();
@@ -78,11 +79,11 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 		this.params = params;
 	}
 
-	public String getContent() {
+	public ByteBuf getContent() {
 		return content;
 	}
 
-	public void setContent(String content) {
+	public void setContent(ByteBuf content) {
 		this.content = content;
 	}
 
@@ -138,7 +139,7 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 				params = new HashMap<>();
 			if (hr instanceof FullHttpRequest) {
 				FullHttpRequest request = (FullHttpRequest) hr;
-				setContent(request.content().toString(charset));
+				setContent(request.content());
 				String contentTypeValue = hr.headers().get("Content-Type");
 				
 				if(!StringUtil.isNullOrEmpty(contentTypeValue)){
