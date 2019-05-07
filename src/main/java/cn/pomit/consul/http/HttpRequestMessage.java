@@ -79,7 +79,11 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 		this.params = params;
 	}
 
-	public ByteBuf getContent() {
+	public String getContent() {
+		return content.toString(charset);
+	}
+	
+	public ByteBuf getBody() {
 		return content;
 	}
 
