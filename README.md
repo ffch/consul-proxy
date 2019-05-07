@@ -22,7 +22,8 @@ Consul-proxy使用netty+consul实现服务注册，并提供了若干简单的�
  4. 多handler支持，类似于spring的Controller。
  5. 支持springboot的server.port和spring.profiles.active多配置文件 (V1.1版本)
  6. 支持@EnableMybatis注解，快速使用mybatis(V1.2版本)
- 
+ 7. 新增@InitConfiguration注解，注解在启动类上，将自动加载注解指定类的initConfiguration方法并传递属性文件。(V1.3版本)
+ 8. Netty在Json请求时，如果解析key-value参数会出现空指针异常，因此Json请求不再解析body的参数，直接返回body内容。(V1.3版本)
 
 ## 使用说明
 
@@ -37,7 +38,7 @@ https://search.maven.org/search?q=consul-proxy ，groupId为cn.pomit。
 <dependency>
 	<groupId>cn.pomit</groupId>
 	<artifactId>consul-proxy</artifactId>
-	<version>1.2</version>
+	<version>1.3</version>
 </dependency>
 ```
 
@@ -65,6 +66,65 @@ public class AlarmApp {
 		ConsulProxyApplication.run(AlarmApp.class);
 	}
 
+}
+```
+
+若需要将属性传递给某个类进行初始化，可以在启动类上加上：
+
+```java
+import cn.pomit.consul.ConsulProxyApplication;
+import cn.pomit.consul.annotation.EnableServer;
+import cn.pomit.consul.annotation.InitConfiguration;
+import cn.pomit.serv.config.DataSourceConfiguration;
+import cn.pomit.serv.config.MailConfiguration;
+import cn.pomit.serv.handler.AdviceHandler;
+import cn.pomit.serv.handler.EmailRestHandler;
+
+@EnableServer(handler = { EmailRestHandler.class,AdviceHandler.class })
+@InitConfiguration(configurations = { DataSourceConfiguration.class })
+public class ServiceApp {
+	public static void main(String[] args) {
+		ConsulProxyApplication.run(ServiceApp.class, args);
+	}
+
+}
+```
+这里，新建了个DataSourceConfiguration，用户替换mybatis的数据源，因此就不需要使用EnableMybatis注解了。
+
+DataSourceConfiguration需要配置Mybatis初始化,调用MybatisConfiguration.initConfiguration进行初始化。
+
+DataSourceConfiguration：
+```java
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.dbcp2.BasicDataSourceFactory;
+
+import cn.pomit.mybatis.configuration.MybatisConfiguration;
+
+public class DataSourceConfiguration {
+	public static final String DATASOURCE_PREFIX = "datasource.";
+	public static void initConfiguration(Properties properties) {
+		String packageName = "cn.pomit.serv.mapper";
+		try {
+			Properties dataSourceProperties = new Properties();
+			for (Object key : properties.keySet()) {
+				String tmpKey = key.toString();
+				if(tmpKey.startsWith(DATASOURCE_PREFIX)){
+					String datasourceKey = tmpKey.replace(DATASOURCE_PREFIX, "");
+					dataSourceProperties.put(datasourceKey, properties.get(key));
+				}
+			}
+			DataSource dataSource = BasicDataSourceFactory.createDataSource(dataSourceProperties);
+			MybatisConfiguration.initConfiguration(packageName, dataSource);
+		} catch (Exception e) {
+			e.printStackTrace();
+			MybatisConfiguration.initConfiguration(packageName, properties);
+		}
+	}
+
+	
 }
 ```
 
