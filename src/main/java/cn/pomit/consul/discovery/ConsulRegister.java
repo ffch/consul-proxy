@@ -33,11 +33,14 @@ public class ConsulRegister {
 		setCheck(service);
 		try {
 			client.agentServiceRegister(service);
+			log.info("服务已注册：{}", service);
 		} catch (ConsulException e) {
 			log.warn("Error registering service with consul: " + service, e);
+
+			log.info("重新提交注册：{}", service);
+			client.agentServiceRegister(service);
 		}
-		client.agentServiceRegister(service);
-		log.info("服务已注册：{}", service);
+
 	}
 
 	private void setCheck(NewService service) {

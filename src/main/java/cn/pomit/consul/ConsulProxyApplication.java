@@ -9,6 +9,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cn.pomit.consul.annotation.EnableDiscovery;
 import cn.pomit.consul.annotation.EnableMybatis;
 import cn.pomit.consul.annotation.EnableServer;
 import cn.pomit.consul.annotation.InitConfiguration;
@@ -16,7 +17,9 @@ import cn.pomit.consul.config.ApplicationProperties;
 import cn.pomit.consul.config.DefaultSource;
 import cn.pomit.consul.config.PropertySource;
 import cn.pomit.consul.config.Source;
+import cn.pomit.consul.discovery.ConsulDiscovery;
 import cn.pomit.consul.endpoint.JsonHttpServer;
+import cn.pomit.consul.rest.RestClient;
 import cn.pomit.consul.util.PropertyUtil;
 import io.netty.util.internal.StringUtil;
 
@@ -61,24 +64,30 @@ public class ConsulProxyApplication {
 					initConfiguration.invoke(null, consulProperties.getServerProperties());
 				}
 			}
-			
+
 			InitConfiguration initConfiguration = app.getAnnotation(InitConfiguration.class);
-			if(initConfiguration != null && initConfiguration.configurations().length > 0){
-				for(Class<?> cls : initConfiguration.configurations()){
+			if (initConfiguration != null && initConfiguration.configurations().length > 0) {
+				for (Class<?> cls : initConfiguration.configurations()) {
 					Method initMethod = null;
-					try{
+					try {
 						initMethod = cls.getMethod("initConfiguration");
-					}catch(Exception e){
-						if(initMethod == null){
+					} catch (Exception e) {
+						if (initMethod == null) {
 							initMethod = cls.getMethod("initConfiguration", Properties.class);
-						}	
+						}
 					}
-					if(initMethod != null){
+					if (initMethod != null) {
 						initMethod.invoke(null, consulProperties.getServerProperties());
 					}
 				}
 			}
-			
+
+			EnableDiscovery enableDiscovery = app.getAnnotation(EnableDiscovery.class);
+			if (enableDiscovery != null) {
+				ConsulDiscovery consulDiscovery = new ConsulDiscovery(consulProperties);
+				RestClient.initConfiguration(consulDiscovery);
+			}
+
 		} catch (IOException e) {
 			log.error("读取配置文件失败！", e);
 			e.printStackTrace();
