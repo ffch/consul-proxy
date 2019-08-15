@@ -8,7 +8,9 @@ Springcloud+consul作为微服务的注册已经见怪不怪了，试下也很�
 
 然而，我的云服务器内存比较小，很快内存就被cloud全家桶吃光了，没办法部署其他应用了，因此，我觉得将一些服务独立出去，放弃cloud全家桶。
 
-Consul-proxy使用netty+consul实现服务注册，并提供了若干简单的注解实现了http的mapping映射处理。
+Consul-proxy使用netty+consul实现服务注册发现，并提供了若干简单的注解实现了http的mapping映射处理。
+
+同时，在2.0版本中，增加了ribbon作为负载均衡策略选择consul中的服务，okhttp或httpclient或者自定义http工具做了客户端进行http请求。
 
 ## [Gitee](https://gitee.com/ffch/consul-proxy)
 ## [Github](https://github.com/ffch/consul-proxy)
@@ -24,6 +26,7 @@ Consul-proxy使用netty+consul实现服务注册，并提供了若干简单的�
  6. 支持@EnableMybatis注解，快速使用mybatis(V1.2版本)
  7. 新增@InitConfiguration注解，注解在启动类上，将自动加载注解指定类的initConfiguration方法并传递属性文件。(V1.3版本)
  8. Netty在Json请求时，如果解析key-value参数会出现空指针异常，因此Json请求不再解析body的参数，直接返回body内容。(V1.3版本)
+ 9. 增加了服务发现及负载均衡http请求功能。使用ribbon + http工具（默认okhttp）进行负载均衡http请求。(V2.0版本)
 
 ## 使用说明
 
@@ -38,7 +41,7 @@ https://search.maven.org/search?q=consul-proxy ，groupId为cn.pomit。
 <dependency>
 	<groupId>cn.pomit</groupId>
 	<artifactId>consul-proxy</artifactId>
-	<version>1.3</version>
+	<version>2.0</version>
 </dependency>
 ```
 
@@ -128,6 +131,35 @@ public class DataSourceConfiguration {
 }
 ```
 
+**若要进行服务调用，需要在启动类上加上@EnableDiscovery注解：**
+
+```java
+package cn.pomit.consulproxy;
+
+import cn.pomit.consul.ConsulProxyApplication;
+import cn.pomit.consul.annotation.EnableDiscovery;
+import cn.pomit.consul.annotation.EnableServer;
+import cn.pomit.consul.annotation.InitConfiguration;
+import cn.pomit.consulproxy.config.MailConfiguration;
+import cn.pomit.consulproxy.handler.EmailRestHandler;
+import cn.pomit.consulproxy.handler.GetTestHandler;
+import cn.pomit.consulproxy.handler.PostTestHandler;
+import cn.pomit.consulproxy.handler.RibbonRestHandler;
+
+@EnableDiscovery
+@EnableServer(handler = { EmailRestHandler.class, RibbonRestHandler.class, GetTestHandler.class,
+		PostTestHandler.class })
+@InitConfiguration(configurations = { MailConfiguration.class })
+public class ConsulApp {
+	public static void main(String[] args) {
+		ConsulProxyApplication.run(ConsulApp.class, args);
+	}
+}
+
+```
+
+详细请查看[ConsulProxy的服务调用](https://www.pomit.cn/consul-proxy/#/?id=_25-%e6%9c%8d%e5%8a%a1%e5%8f%91%e7%8e%b0%ef%bc%88v20%ef%bc%89)。
+
 ### 业务逻辑
 
 继承AbstractResourceHandler的handler可以实现业务逻辑。
@@ -155,6 +187,43 @@ handler中可以使用Mapping注解进行路径映射：
 
 可以使用spring.profiles.active或者profiles.active指定多个配置文件。
 
+#### 初始化配置
+
+InitConfiguration注解放在启动类上，用来将属性传递给某个类进行初始化。
+
+如：
+
+```java
+import cn.pomit.consul.ConsulProxyApplication;
+import cn.pomit.consul.annotation.EnableServer;
+import cn.pomit.consul.annotation.InitConfiguration;
+import cn.pomit.serv.config.DataSourceConfiguration;
+import cn.pomit.serv.config.MailConfiguration;
+import cn.pomit.serv.handler.AdviceHandler;
+import cn.pomit.serv.handler.EmailRestHandler;
+
+@EnableServer(handler = { EmailRestHandler.class,AdviceHandler.class })
+@InitConfiguration(configurations = { DataSourceConfiguration.class })
+public class ServiceApp {
+	public static void main(String[] args) {
+		ConsulProxyApplication.run(ServiceApp.class, args);
+	}
+
+}
+```
+详情请查看[ConsulProxy的initconfiguration](https://www.pomit.cn/consul-proxy/#/?id=_34-initconfiguration)
+
+#### 启用Mybatis
+
+使用EnableMybatis注解放在启动类上，用来加载myabtis-proxy组件。myabtis-proxy是快速启动mybatis的一个组件。
+
+详情请查看[ConsulProxy的EnableMybatis](https://www.pomit.cn/consul-proxy/#/?id=_35-enablemybatis)
+
+#### 启用服务发现
+
+使用EnableDiscovery注解放在启动类上，用来支持注册到Consul的服务调用。使用ribbon做负载均衡。默认选择okhttp做http请求，同时内置httpclient并支持自定义http工具。
+
+详细请查看[ConsulProxy的服务调用](https://www.pomit.cn/consul-proxy/#/?id=_25-%e6%9c%8d%e5%8a%a1%e5%8f%91%e7%8e%b0%ef%bc%88v20%ef%bc%89)。
 
 ## 性能测试
 调用demo项目中的hosts接口对cloud和netty进行对比
