@@ -71,11 +71,13 @@ public class ResourceHandlerFactory {
 				handlerMethod.setMethod(methods[j]);
 				handlerMethod.setResourceHandler(resourceHandler);
 				ResourceServerHandler.getElMethod().put(param[0], handlerMethod);
+				log.info("映射{}到{}方法", param[0], handlerMethod.getMethod().getName());
 			} else {
 				HandlerMethod handlerMethod = new HandlerMethod();
 				handlerMethod.setMethod(methods[j]);
 				handlerMethod.setResourceHandler(resourceHandler);
 				ResourceServerHandler.getNormalMethod().put(methodValue, handlerMethod);
+				log.info("映射{}到{}方法", methodValue, handlerMethod.getMethod().getName());
 			}
 
 		}

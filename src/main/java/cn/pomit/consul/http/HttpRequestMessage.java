@@ -16,6 +16,7 @@ import cn.pomit.consul.http.res.ResType;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpVersion;
@@ -141,7 +142,7 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 			}
 			if (params == null)
 				params = new HashMap<>();
-			if (hr instanceof FullHttpRequest) {
+			if (hr instanceof FullHttpRequest && !hr.method().equals(HttpMethod.GET)) {
 				FullHttpRequest request = (FullHttpRequest) hr;
 				setContent(request.content());
 				String contentTypeValue = hr.headers().get("Content-Type");
@@ -160,6 +161,7 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 						params.put(attribute.getName(), value);
 					}
 				}
+				decoder.destroy();
 			}
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -173,7 +175,7 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 	 * @param query
 	 * @return
 	 */
-	public Map<String, Object> createGetParamMap(String query) {
+	private Map<String, Object> createGetParamMap(String query) {
 		int index = -1;
 		if ((index = query.indexOf(";")) != -1) {
 			String cookieStr = query.substring(index + 1);
@@ -198,6 +200,14 @@ public class HttpRequestMessage extends DefaultHttpRequest {
 			params.put(map[0], map[1]);
 		}
 		return params;
+	}
+
+	public Map<String, Cookie> getCookies() {
+		return cookies;
+	}
+
+	public void setCookies(Map<String, Cookie> cookies) {
+		this.cookies = cookies;
 	}
 
 	@Override

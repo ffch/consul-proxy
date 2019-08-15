@@ -71,7 +71,6 @@ public abstract class AbstractClientHttpRequest<L, S, R, U> implements ClientHtt
 		if (headerMap != null) {
 			allHeaderMap.putAll(headerMap);
 		}
-		allHeaderMap.put(localAddressHeader, InetUtil.findFirstNonLoopbackAddress(null).getHostAddress());
 		addHeaders(allHeaderMap, requestBuilder, headerAction);
 		if (cookieMap == null) {
 			cookieMap = new HashMap<>(0);

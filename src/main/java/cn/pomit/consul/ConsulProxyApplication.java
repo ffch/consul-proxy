@@ -20,6 +20,7 @@ import cn.pomit.consul.config.Source;
 import cn.pomit.consul.discovery.ConsulDiscovery;
 import cn.pomit.consul.endpoint.JsonHttpServer;
 import cn.pomit.consul.rest.RestClient;
+import cn.pomit.consul.rest.RestClientConfig;
 import cn.pomit.consul.util.PropertyUtil;
 import io.netty.util.internal.StringUtil;
 
@@ -41,6 +42,14 @@ public class ConsulProxyApplication {
 			EnableServer jsonServer = app.getAnnotation(EnableServer.class);
 			int port = jsonServer.port();
 			ApplicationProperties consulProperties = new ApplicationProperties(sourceList, port);
+
+			EnableDiscovery enableDiscovery = app.getAnnotation(EnableDiscovery.class);
+			if (enableDiscovery != null) {
+				ConsulDiscovery consulDiscovery = new ConsulDiscovery(consulProperties);
+				RestClientConfig restClientConfig = new RestClientConfig(consulProperties);
+				RestClient.initConfiguration(consulDiscovery, restClientConfig);
+			}
+
 			JsonHttpServer defaultJsonServer = new JsonHttpServer(consulProperties);
 
 			defaultJsonServer.setResourceHandlers(jsonServer.handler());
@@ -80,12 +89,6 @@ public class ConsulProxyApplication {
 						initMethod.invoke(null, consulProperties.getServerProperties());
 					}
 				}
-			}
-
-			EnableDiscovery enableDiscovery = app.getAnnotation(EnableDiscovery.class);
-			if (enableDiscovery != null) {
-				ConsulDiscovery consulDiscovery = new ConsulDiscovery(consulProperties);
-				RestClient.initConfiguration(consulDiscovery);
 			}
 
 		} catch (IOException e) {

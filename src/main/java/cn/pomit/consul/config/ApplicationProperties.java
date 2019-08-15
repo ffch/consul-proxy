@@ -225,6 +225,10 @@ public class ApplicationProperties {
 		return serverProperties.getProperty(key);
 	}
 
+	public String getString(String key, String defaultValue) {
+		return serverProperties.getProperty(key, defaultValue);
+	}
+
 	public int getInt(String key) {
 		String value = serverProperties.getProperty(key);
 		if (StringUtil.isNullOrEmpty(value)) {
@@ -234,10 +238,28 @@ public class ApplicationProperties {
 		}
 	}
 
+	public int getInt(String key, int defaultValue) {
+		String value = serverProperties.getProperty(key);
+		if (StringUtil.isNullOrEmpty(value)) {
+			return defaultValue;
+		} else {
+			return Integer.parseInt(value);
+		}
+	}
+
 	public boolean getBoolean(String key) {
 		String value = serverProperties.getProperty(key);
 		if (StringUtil.isNullOrEmpty(value)) {
 			return false;
+		} else {
+			return Boolean.parseBoolean(value);
+		}
+	}
+	
+	public boolean getBoolean(String key, boolean defaultValue) {
+		String value = serverProperties.getProperty(key);
+		if (StringUtil.isNullOrEmpty(value)) {
+			return defaultValue;
 		} else {
 			return Boolean.parseBoolean(value);
 		}
@@ -260,5 +282,5 @@ public class ApplicationProperties {
 	public void setServerProperties(Properties serverProperties) {
 		this.serverProperties = serverProperties;
 	}
-	
+
 }

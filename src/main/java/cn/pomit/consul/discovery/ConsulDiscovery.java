@@ -37,7 +37,7 @@ public class ConsulDiscovery {
 
 			List<Server> servers = new ArrayList<Server>();
 			for (HealthService item : list) {
-				log.info("服务{}注册的机器有：{}", serviceId, item.getService().toString());
+				log.debug("服务{}注册的机器有：{}", serviceId, item.getService().toString());
 				servers.add(new Server(item.getService().getAddress(), item.getService().getPort()));
 			}
 			balancer.addServers(servers);

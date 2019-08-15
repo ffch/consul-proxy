@@ -19,7 +19,6 @@ package cn.pomit.consul.rest.client;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 /**
  * Represents a client-side HTTP response.

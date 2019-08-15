@@ -4,18 +4,30 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import org.apache.http.client.HttpRequestRetryHandler;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.fastjson.JSONObject;
 import com.netflix.loadbalancer.Server;
 
 import cn.pomit.consul.discovery.ConsulDiscovery;
 import cn.pomit.consul.rest.client.ClientHttpRequest;
 import cn.pomit.consul.rest.client.ClientHttpResponse;
+import cn.pomit.consul.rest.client.httpcomponents.HttpComponentsClientHttpRequest;
 import cn.pomit.consul.rest.client.okhttp.OkHttp3ClientHttpRequest;
 import cn.pomit.consul.util.NameValuePair;
 import cn.pomit.consul.util.URLUtil;
+import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 
 /**
@@ -38,12 +50,53 @@ public class RestClient {
 
 	}
 
-	public static void initConfiguration(ConsulDiscovery consulDiscovery) {
+	public static void initConfiguration(ConsulDiscovery consulDiscovery, RestClientConfig restClientConfig) {
 		instance = new RestClient();
-		if (instance.clientHttpRequest == null) {
-			instance.clientHttpRequest = new OkHttp3ClientHttpRequest(new OkHttpClient.Builder().build());
-		}
 		instance.consulDiscovery = consulDiscovery;
+
+		if (restClientConfig.getHttpType().equalsIgnoreCase(RestClientConfig.OKTTP_TYPE)) {
+			logger.info("使用okHttp作为Rest请求客户端");
+			OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder();
+			okHttpClientBuilder.connectTimeout(restClientConfig.getTimeout(), TimeUnit.MILLISECONDS)
+					.readTimeout(restClientConfig.getTimeout(), TimeUnit.MILLISECONDS)
+					.writeTimeout(restClientConfig.getTimeout(), TimeUnit.MILLISECONDS);
+			if (restClientConfig.isRetry()) {
+				okHttpClientBuilder.retryOnConnectionFailure(true);
+			} else {
+				okHttpClientBuilder.retryOnConnectionFailure(false);
+			}
+			if (restClientConfig.isEnablePool()) {
+				ConnectionPool connectionPool = new ConnectionPool(restClientConfig.getPoolMaxIdle(), 10,
+						TimeUnit.MINUTES);
+				okHttpClientBuilder.connectionPool(connectionPool);
+			}
+			OkHttpClient okHttpClient = okHttpClientBuilder.build();
+			ClientHttpRequest httpClientRequest = new OkHttp3ClientHttpRequest(okHttpClient);
+			instance.clientHttpRequest = httpClientRequest;
+		} else if (restClientConfig.getHttpType().equalsIgnoreCase(RestClientConfig.HTTPCLIENT_TYPE)) {
+			logger.info("使用HttpClient作为Rest请求客户端");
+			SocketConfig socketConfig = SocketConfig.custom().setSoReuseAddress(true)
+					.setSoTimeout(restClientConfig.getTimeout()).setSoKeepAlive(true).build();
+
+			HttpRequestRetryHandler requestRetryHandler = new DefaultHttpRequestRetryHandler(0, false);
+
+			if (restClientConfig.isRetry()) {
+				requestRetryHandler = new DefaultHttpRequestRetryHandler(restClientConfig.getRetryTimes(), true);
+			}
+			if (restClientConfig.isEnablePool()) {
+				PoolingHttpClientConnectionManager clientConnectionManager = new PoolingHttpClientConnectionManager();
+				clientConnectionManager.setMaxTotal(restClientConfig.getPoolMaxIdle());
+				clientConnectionManager.setDefaultSocketConfig(socketConfig);
+				CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(clientConnectionManager)
+						.setRetryHandler(requestRetryHandler).build();
+				instance.clientHttpRequest = new HttpComponentsClientHttpRequest(httpClient);
+			} else {
+				instance.clientHttpRequest = new HttpComponentsClientHttpRequest(HttpClientBuilder.create()
+						.setDefaultSocketConfig(socketConfig).setRetryHandler(requestRetryHandler).build());
+			}
+		} else {
+			logger.info("未设置客户端类型，请手动实现并添加ClientHttpRequest的子类。");
+		}
 	}
 
 	public static RestClient getInstance() {
@@ -58,7 +111,45 @@ public class RestClient {
 			baseUrl = uri.getScheme() + URLUtil.URI_SCHEME_SEPARATOR + server.getHost()
 					+ (server.getPort() == -1 ? "" : (":" + server.getPort()));
 		}
+		logger.info("请求域为：{}", baseUrl);
+
 		return baseUrl;
+	}
+
+	public <T> T getForObject(String url, Class<T> responseType, Map<String, ?> uriVariables) throws IOException {
+		List<NameValuePair> paramList = null;
+		if (uriVariables != null) {
+			paramList = uriVariables.entrySet().stream()
+					.map(e -> new NameValuePair(e.getKey(), e.getValue().toString())).collect(Collectors.toList());
+		}
+
+		ClientHttpResponse response = get(url, paramList);
+		String responseBodyStr = (response == null) ? null : response.getBodyStr();
+
+		if (responseBodyStr == null || responseBodyStr == null)
+			return null;
+		return JSONObject.parseObject(responseBodyStr, responseType);
+	}
+
+	public <T> T postForObject(String url, Class<T> responseType, Map<String, ?> uriVariables) throws IOException {
+		List<NameValuePair> paramList = null;
+		if (uriVariables != null) {
+			paramList = uriVariables.entrySet().stream()
+					.map(e -> new NameValuePair(e.getKey(), e.getValue().toString())).collect(Collectors.toList());
+		}
+		ClientHttpResponse response = postForm(url, paramList);
+		String responseBodyStr = (response == null) ? null : response.getBodyStr();
+		if (responseBodyStr == null || responseBodyStr == null)
+			return null;
+		return JSONObject.parseObject(responseBodyStr, responseType);
+	}
+
+	public <E, T> T postForObject(String url, Class<T> responseType, E object) throws IOException {
+		ClientHttpResponse response = postTextBody(url, JSONObject.toJSONString(object));
+		String responseBodyStr = (response == null) ? null : response.getBodyStr();
+		if (responseBodyStr == null || responseBodyStr == null)
+			return null;
+		return JSONObject.parseObject(responseBodyStr, responseType);
 	}
 
 	/**
