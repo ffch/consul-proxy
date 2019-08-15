@@ -23,7 +23,6 @@ import cn.pomit.consul.util.URLUtil;
  * @param <U>
  *            request类型
  * @author wuguangkuo
- * @create 2018-08-23 16:57
  **/
 public abstract class AbstractClientHttpRequest<L, S, R, U> implements ClientHttpRequest {
 	private String localAddressHeader = "x-local-addr";
@@ -98,8 +97,8 @@ public abstract class AbstractClientHttpRequest<L, S, R, U> implements ClientHtt
 	 * 
 	 * @param r
 	 *            request body参数
-	 * @throws IOException
-	 * @return
+	 * @throws IOException io异常
+	 * @return byte内容
 	 */
 	protected abstract byte[] getBodyBytes(R r) throws IOException;
 
@@ -108,8 +107,8 @@ public abstract class AbstractClientHttpRequest<L, S, R, U> implements ClientHtt
 	 * 
 	 * @param u
 	 *            Request对象
-	 * @throws IOException
-	 * @return
+	 * @throws IOException io异常
+	 * @return http响应
 	 */
 	protected abstract ClientHttpResponse execute(U u) throws IOException;
 

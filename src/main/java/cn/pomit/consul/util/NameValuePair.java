@@ -1,8 +1,7 @@
 package cn.pomit.consul.util;
 
 /**
- * @author wuguangkuo
- * @create 2018-08-23 19:13
+ * @author cff
  **/
 public class NameValuePair {
 	private String name;

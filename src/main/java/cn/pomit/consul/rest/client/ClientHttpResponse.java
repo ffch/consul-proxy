@@ -57,8 +57,8 @@ public interface ClientHttpResponse extends Closeable {
 	/**
 	 * 获取body字符串，完成之后关闭流
 	 * 
-	 * @return
-	 * @throws IOException
+	 * @return 报文体
+	 * @throws IOException io异常
 	 */
 	String getBodyStr() throws IOException;
 

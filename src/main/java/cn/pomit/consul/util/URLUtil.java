@@ -4,7 +4,6 @@ package cn.pomit.consul.util;
  * URL工具类
  *
  * @author wuguangkuo
- * @create 2018-11-27 18:34
  **/
 public class URLUtil {
 	public static final String URI_SEPARATOR = "/";
@@ -13,8 +12,8 @@ public class URLUtil {
 	/**
 	 * 删除baseUrl结尾的"/"
 	 * 
-	 * @param baseUrl
-	 * @return
+	 * @param baseUrl url地址
+	 * @return 修改后的url
 	 */
 	public static String trimBaseUrl(String baseUrl) {
 		String trimUrl = baseUrl.trim();
@@ -28,8 +27,8 @@ public class URLUtil {
 	/**
 	 * 给指定的path开头拼接上缺少的/
 	 * 
-	 * @param path
-	 * @return
+	 * @param path url地址
+	 * @return 修改后的url
 	 */
 	public static String completePath(String path) {
 		String trimPath = path.trim();
@@ -42,8 +41,8 @@ public class URLUtil {
 	/**
 	 * 给定一个普通url,如：https://www.baidu.com/，解析其host部分
 	 * 
-	 * @param url
-	 * @return
+	 * @param url url地址
+	 * @return 修改后的url
 	 */
 	public static String parseHost(String url) {
 		int beginIdx = 0;

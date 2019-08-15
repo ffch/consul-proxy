@@ -345,11 +345,22 @@ public class GatewayAlarmHandler extends AbstractResourceHandler {
 
 ## Demo项目
 
-## [Gitee-Consul-proxy-demo](https://gitee.com/ffch/consul-proxy-demo)
-## [Github-Consul-proxy-demo](https://github.com/ffch/consul-proxy-demo)
+版本是向下兼容的，但为免混淆，demo项目区分开。
 
-## [Gitee-Consul-proxy-test](https://gitee.com/ffch/consul-proxy-test)
-## [Github-Consul-proxy-test](https://github.com/ffch/consul-proxy-test)
+### 2.0版本的demo项目
+[Gitee-Consul-proxy-demo-2.0](https://gitee.com/ffch/consul-proxy-demo-2.0)
+
+[Github-Consul-proxy-demo-2.0](https://github.com/ffch/consul-proxy-demo-2.0)
+
+## 1.3 版本前的项目
+[Gitee-Consul-proxy-demo](https://gitee.com/ffch/consul-proxy-demo)
+
+[Github-Consul-proxy-demo](https://github.com/ffch/consul-proxy-demo)
+
+[Gitee-Consul-proxy-test](https://gitee.com/ffch/consul-proxy-test)
+
+[Github-Consul-proxy-test](https://github.com/ffch/consul-proxy-test)
+
 ## [Get-Started](https://www.pomit.cn/consul-proxy)
 
 ## 版权声明

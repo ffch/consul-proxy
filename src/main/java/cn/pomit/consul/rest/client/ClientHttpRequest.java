@@ -34,13 +34,13 @@ public interface ClientHttpRequest {
 	/**
 	 * GET请求
 	 * 
-	 * @param baseUrl
-	 * @param path
-	 * @param paramList
-	 * @param headerMap
-	 * @param cookieMap
-	 * @return
-	 * @throws IOException
+	 * @param baseUrl 域名/ip端口
+	 * @param path 路径
+	 * @param paramList 参数列表
+	 * @param headerMap header
+	 * @param cookieMap cookie
+	 * @return http响应
+	 * @throws IOException io异常
 	 */
 	ClientHttpResponse executeGetRequest(String baseUrl, String path, List<NameValuePair> paramList,
 			Map<String, String> headerMap, Map<String, String> cookieMap) throws IOException;
@@ -48,14 +48,14 @@ public interface ClientHttpRequest {
 	/**
 	 * 普通表单请求
 	 * 
-	 * @param baseUrl
-	 * @param path
-	 * @param httpMethod
-	 * @param paramList
-	 * @param headerMap
-	 * @param cookieMap
-	 * @return
-	 * @throws IOException
+	 * @param baseUrl 域名/ip端口
+	 * @param path 路径
+	 * @param httpMethod 请求方法
+	 * @param paramList 参数列表
+	 * @param headerMap header
+	 * @param cookieMap cookie
+	 * @return http响应
+	 * @throws IOException io异常
 	 */
 	ClientHttpResponse executeCommonFormRequest(String baseUrl, String path, String httpMethod,
 			List<NameValuePair> paramList, Map<String, String> headerMap, Map<String, String> cookieMap)
@@ -64,14 +64,14 @@ public interface ClientHttpRequest {
 	/**
 	 * multipart-form请求
 	 * 
-	 * @param baseUrl
-	 * @param path
-	 * @param httpMethod
-	 * @param paramList
-	 * @param headerMap
-	 * @param cookieMap
-	 * @return
-	 * @throws IOException
+	 * @param baseUrl 域名/ip端口
+	 * @param path 路径
+	 * @param httpMethod 请求方法
+	 * @param paramList 参数列表
+	 * @param headerMap header
+	 * @param cookieMap cookie
+	 * @return http响应
+	 * @throws IOException io异常
 	 */
 	ClientHttpResponse executeMultipartFormRequest(String baseUrl, String path, String httpMethod,
 			List<NameValuePair> paramList, Map<String, String> headerMap, Map<String, String> cookieMap)
@@ -80,14 +80,14 @@ public interface ClientHttpRequest {
 	/**
 	 * json body请求
 	 * 
-	 * @param baseUrl
-	 * @param path
-	 * @param httpMethod
-	 * @param jsonBody
-	 * @param headerMap
-	 * @param cookieMap
-	 * @return
-	 * @throws IOException
+	 * @param baseUrl 域名/ip端口
+	 * @param path 路径
+	 * @param httpMethod 请求方法
+	 * @param jsonBody json报文
+	 * @param headerMap header
+	 * @param cookieMap cookie
+	 * @return http响应
+	 * @throws IOException io异常
 	 */
 	ClientHttpResponse executeTextBodyRequest(String baseUrl, String path, String httpMethod, String jsonBody,
 			Map<String, String> headerMap, Map<String, String> cookieMap) throws IOException;

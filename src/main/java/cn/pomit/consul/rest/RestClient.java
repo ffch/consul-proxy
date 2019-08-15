@@ -31,11 +31,10 @@ import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 
 /**
- * kong api client
+ * rest客户端
+ * @author fufei
  *
- * @author wuguangkuo
- * @since 1.6-SNAPSHOT 2018-08-23
- **/
+ */
 public class RestClient {
 	private static RestClient instance = null;
 	private ClientHttpRequest clientHttpRequest;
@@ -116,6 +115,15 @@ public class RestClient {
 		return baseUrl;
 	}
 
+	/**
+	 * get请求获取实体，要求远程返回的是json数据
+	 * @param url 请求路径
+	 * @param responseType 响应实体
+	 * @param uriVariables url参数
+	 * @param <T> 响应实体泛型
+	 * @return 返回响应实体
+	 * @throws IOException io异常
+	 */
 	public <T> T getForObject(String url, Class<T> responseType, Map<String, ?> uriVariables) throws IOException {
 		List<NameValuePair> paramList = null;
 		if (uriVariables != null) {
@@ -131,6 +139,15 @@ public class RestClient {
 		return JSONObject.parseObject(responseBodyStr, responseType);
 	}
 
+	/**
+	 * post请求获取实体，要求远程返回的是json数据
+	 * @param url 请求路径
+	 * @param responseType 响应实体
+	 * @param <T> 响应实体泛型
+	 * @param uriVariables url参数
+	 * @return 返回响应实体
+	 * @throws IOException io异常
+	 */
 	public <T> T postForObject(String url, Class<T> responseType, Map<String, ?> uriVariables) throws IOException {
 		List<NameValuePair> paramList = null;
 		if (uriVariables != null) {
@@ -144,6 +161,16 @@ public class RestClient {
 		return JSONObject.parseObject(responseBodyStr, responseType);
 	}
 
+	/**
+	 * post请求获取实体，要求远程返回的是json数据
+	 * @param url 请求路径
+	 * @param responseType 响应实体
+	 * @param <E> 请求实体类型
+	 * @param <T> 响应实体泛型
+	 * @param object 请求实体
+	 * @return 返回响应实体
+	 * @throws IOException io异常
+	 */
 	public <E, T> T postForObject(String url, Class<T> responseType, E object) throws IOException {
 		ClientHttpResponse response = postTextBody(url, JSONObject.toJSONString(object));
 		String responseBodyStr = (response == null) ? null : response.getBodyStr();
@@ -155,11 +182,12 @@ public class RestClient {
 	/**
 	 * 发送get请求
 	 *
-	 * @param path
+	 * @param url
 	 *            请求path
 	 * @param paramList
 	 *            请求参数
-	 * @return
+	 * @return http响应
+	 * @throws IOException io异常
 	 */
 	public ClientHttpResponse get(String url, List<NameValuePair> paramList) throws IOException {
 		return get(url, paramList, null, null);
@@ -168,11 +196,16 @@ public class RestClient {
 	/**
 	 * 发送get请求
 	 *
-	 * @param path
+	 * @param url
 	 *            请求path
 	 * @param paramList
 	 *            请求参数
-	 * @return
+	 * @param headerMap 请求头
+	 * 
+	 * @param cookieMap cookie
+	 *
+	 * @return http响应
+	 * @throws IOException io异常
 	 */
 	public ClientHttpResponse get(String url, List<NameValuePair> paramList, Map<String, String> headerMap,
 			Map<String, String> cookieMap) throws IOException {
@@ -185,9 +218,11 @@ public class RestClient {
 	/**
 	 * post请求
 	 *
-	 * @param path
+	 * @param url
 	 *            请求path
-	 * @return
+	 * @param paramList 参数列表         
+	 * @return http响应
+	 * @throws IOException io异常
 	 */
 	public ClientHttpResponse postForm(String url, List<NameValuePair> paramList) throws IOException {
 		return postForm(url, paramList, null, null);
@@ -196,9 +231,15 @@ public class RestClient {
 	/**
 	 * post请求
 	 *
-	 * @param path
+	 * @param url
 	 *            请求path
-	 * @return
+	 * @param paramList 参数列表      
+	 * @param headerMap 请求头
+	 * 
+	 * @param cookieMap cookie
+	 *
+	 * @return http响应
+	 * @throws IOException io异常
 	 */
 	public ClientHttpResponse postForm(String url, List<NameValuePair> paramList, Map<String, String> headerMap,
 			Map<String, String> cookieMap) throws IOException {
@@ -210,12 +251,12 @@ public class RestClient {
 	/**
 	 * 支持 mutilpart/form-data方式的请求
 	 * 
-	 * @param path
+	 * @param url
 	 *            请求path
 	 * @param paramList
 	 *            表单参数
-	 * @return
-	 * @throws IOException
+	 * @return http响应
+	 * @throws IOException io异常
 	 */
 	public ClientHttpResponse postMultipartForm(String url, List<NameValuePair> paramList) throws IOException {
 		return postMultipartForm(url, paramList, null, null);
@@ -224,12 +265,16 @@ public class RestClient {
 	/**
 	 * 支持 mutilpart/form-data方式的请求
 	 * 
-	 * @param path
+	 * @param url
 	 *            请求path
 	 * @param paramList
 	 *            表单参数
-	 * @return
-	 * @throws IOException
+	 * @param headerMap 请求头
+	 * 
+	 * @param cookieMap cookie
+	 * 
+	 * @return http响应
+	 * @throws IOException io异常
 	 */
 	public ClientHttpResponse postMultipartForm(String url, List<NameValuePair> paramList,
 			Map<String, String> headerMap, Map<String, String> cookieMap) throws IOException {

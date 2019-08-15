@@ -7,7 +7,6 @@ package cn.pomit.consul.rest.client.function;
  * @param <U> 第三个argument
  * @param <R> 返回类型
  * @author wuguangkuo
- * @create 2018-12-12 19:22
  **/
 public interface TriFunction<T, S, U, R> {
     /**
